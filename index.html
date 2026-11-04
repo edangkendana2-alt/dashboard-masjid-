@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Digital Masjid Siti Musalmah Bogor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
+    .bg-emerald-glass { background: rgba(6, 78, 59, 0.85); backdrop-filter: blur(12px); }
+    .card-glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+
+  <!-- Header -->
+  <header class="bg-emerald-glass border-b border-emerald-500/30 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center font-bold text-emerald-400 text-xl">
+          MSM
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            MASJID SITI MUSALMAH <span class="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full">BOGOR</span>
+          </h1>
+          <p class="text-xs text-emerald-200/80"><i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>Jl Ace Sukarna V Pasir Mulya, Bogor Barat, Kota Bogor</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="text-right">
+          <div id="clock" class="text-xl font-mono font-bold text-emerald-300">00.00.00 WIB</div>
+          <div id="date" class="text-xs text-slate-400">Loading...</div>
+        </div>
+        <div id="status-badge" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          Menghubungkan ke Google Sheets...
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 mt-6 space-y-6">
+
+    <!-- Config API URL Input (PENTING UNTUK GITHUB PAGES) -->
+    <section class="card-glass p-4 rounded-xl border border-amber-500/30 bg-amber-950/20">
+      <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
+        <div class="text-xs text-amber-200">
+          <i class="fa-solid fa-link mr-1"></i> <strong>URL Web App Google Apps Script:</strong>
+        </div>
+        <input type="text" id="script-url" placeholder="Paste URL Apps Script (https://script.google.com/macros/s/.../exec)" 
+               class="w-full md:w-2/3 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-500">
+        <button onclick="saveApiUrl()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold transition">
+          Simpan & Hubungkan
+        </button>
+      </div>
+    </section>
+
+    <!-- Ringkasan Kas & Agenda -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="card-glass p-6 rounded-2xl border-l-4 border-l-emerald-500">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs uppercase font-semibold tracking-wider text-slate-400">Saldo Kas Utama</p>
+            <h3 id="saldo-utama" class="text-3xl font-extrabold text-emerald-400 mt-2">Rp 0</h3>
+          </div>
+          <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 text-2xl"><i class="fa-solid fa-wallet"></i></div>
+        </div>
+      </div>
+
+      <div class="card-glass p-6 rounded-2xl border-l-4 border-l-amber-500">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs uppercase font-semibold tracking-wider text-slate-400">Total Agenda Aktif</p>
+            <h3 id="total-agenda" class="text-3xl font-extrabold text-amber-400 mt-2">0 Kegiatan</h3>
+          </div>
+          <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400 text-2xl"><i class="fa-solid fa-calendar-check"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Daftar Kegiatan -->
+    <section class="card-glass p-6 rounded-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold text-emerald-300 flex items-center gap-2"><i class="fa-solid fa-list-check"></i> Agenda & Jadwal Kegiatan</h2>
+      </div>
+      <div id="kegiatan-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <p class="text-slate-400 text-sm">Memuat data dari Google Sheets...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // System Initialization
+    let API_URL = localStorage.getItem('MSM_SCRIPT_URL') || '';
+
+    if (API_URL) {
+      document.getElementById('script-url').value = API_URL;
+      loadDashboardData();
+    }
+
+    function saveApiUrl() {
+      const url = document.getElementById('script-url').value.trim();
+      if (!url) return alert('Masukkan URL Apps Script!');
+      localStorage.setItem('MSM_SCRIPT_URL', url);
+      API_URL = url;
+      loadDashboardData();
+    }
+
+    // Jam Realtime
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+      document.getElementById('date').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }, 1000);
+
+    // Fetch Data
+    async function loadDashboardData() {
+      if (!API_URL) return;
+      const statusBadge = document.getElementById('status-badge');
+      
+      try {
+        const response = await fetch(API_URL + '?action=getData');
+        const data = await response.json();
+
+        // Update Status
+        statusBadge.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-2";
+        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Terhubung Live ke Google Sheets`;
+
+        // Render Agenda
+        const kegContainer = document.getElementById('kegiatan-container');
+        if (data.kegiatan && data.kegiatan.length > 0) {
+          kegContainer.innerHTML = data.kegiatan.map(k => `
+            <div class="p-4 bg-slate-800/60 rounded-xl border border-slate-700/50">
+              <span class="text-[10px] px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-semibold">${k.kategori || 'Umum'}</span>
+              <h4 class="font-bold text-white mt-2">${k.judul || '-'}</h4>
+              <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-user-tie text-emerald-400 mr-1"></i> ${k.ustadz || '-'}</p>
+              <p class="text-xs text-slate-400"><i class="fa-solid fa-clock text-amber-400 mr-1"></i> ${k.waktu || '-'}</p>
+            </div>
+          `).join('');
+          document.getElementById('total-agenda').innerText = `${data.kegiatan.length} Kegiatan`;
+        } else {
+          kegContainer.innerHTML = `<p class="text-slate-400 text-sm">Belum ada kegiatan terdaftar.</p>`;
+        }
+
+      } catch (err) {
+        statusBadge.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-2";
+        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Gagal Terhubung`;
+      }
+    }
+  </script>
+</body>
+</html>
