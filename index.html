@@ -46,7 +46,7 @@
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 mt-6 space-y-6">
 
-    <!-- Config API URL Input (PENTING UNTUK GITHUB PAGES) -->
+    <!-- Config API URL Input -->
     <section class="card-glass p-4 rounded-xl border border-amber-500/30 bg-amber-950/20">
       <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
         <div class="text-xs text-amber-200">
@@ -96,7 +96,6 @@
   </main>
 
   <script>
-    // System Initialization
     let API_URL = localStorage.getItem('MSM_SCRIPT_URL') || '';
 
     if (API_URL) {
@@ -119,20 +118,24 @@
       document.getElementById('date').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     }, 1000);
 
-    // Fetch Data
-    async function loadDashboardData() {
+    // Fetch Data via JSONP (Mencegah Blokir CORS)
+    function loadDashboardData() {
       if (!API_URL) return;
       const statusBadge = document.getElementById('status-badge');
       
-      try {
-        const response = await fetch(API_URL + '?action=getData');
-        const data = await response.json();
+      const oldScript = document.getElementById('jsonp-script');
+      if (oldScript) oldScript.remove();
 
-        // Update Status
+      window.handleDashboardResponse = function(data) {
+        if (data.error) {
+          statusBadge.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-2";
+          statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Gagal: ${data.error}`;
+          return;
+        }
+
         statusBadge.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-2";
         statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Terhubung Live ke Google Sheets`;
 
-        // Render Agenda
         const kegContainer = document.getElementById('kegiatan-container');
         if (data.kegiatan && data.kegiatan.length > 0) {
           kegContainer.innerHTML = data.kegiatan.map(k => `
@@ -145,13 +148,18 @@
           `).join('');
           document.getElementById('total-agenda').innerText = `${data.kegiatan.length} Kegiatan`;
         } else {
-          kegContainer.innerHTML = `<p class="text-slate-400 text-sm">Belum ada kegiatan terdaftar.</p>`;
+          kegContainer.innerHTML = `<p class="text-slate-400 text-sm">Belum ada kegiatan terdaftar dalam spreadsheet.</p>`;
         }
+      };
 
-      } catch (err) {
+      const script = document.createElement('script');
+      script.id = 'jsonp-script';
+      script.src = `${API_URL}?action=getData&callback=handleDashboardResponse`;
+      script.onerror = function() {
         statusBadge.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-2";
         statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Gagal Terhubung`;
-      }
+      };
+      document.body.appendChild(script);
     }
   </script>
 </body>
