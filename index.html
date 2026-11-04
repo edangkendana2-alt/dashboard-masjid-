@@ -96,7 +96,8 @@
   </main>
 
   <script>
-    let API_URL = localStorage.getItem('MSM_SCRIPT_URL') || '';
+    // URL Default terkuci ke Versi 12 Apps Script
+    let API_URL = localStorage.getItem('MSM_SCRIPT_URL') || 'https://script.google.com/macros/s/AKfycbxw8gAoBBRDwl8FQfNOMeBZ5DwmwK-tdQzQ5rTEZbIpMuwxf7H4vrFGPL69Wb4f3Xd/exec';
 
     if (API_URL) {
       document.getElementById('script-url').value = API_URL;
