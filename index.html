@@ -7,8 +7,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap');
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
+    .font-arabic { font-family: 'Amiri', serif; }
     .bg-emerald-glass { background: rgba(6, 78, 59, 0.85); backdrop-filter: blur(12px); }
     .card-glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
   </style>
@@ -35,9 +36,9 @@
           <div id="clock" class="text-xl font-mono font-bold text-emerald-300">00.00.00 WIB</div>
           <div id="date" class="text-xs text-slate-400">Loading...</div>
         </div>
-        <div id="status-badge" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-          Menghubungkan ke Google Sheets...
+        <div id="status-badge" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          Terhubung Live ke Google Sheets
         </div>
       </div>
     </div>
@@ -52,7 +53,7 @@
         <div class="text-xs text-amber-200">
           <i class="fa-solid fa-link mr-1"></i> <strong>URL Web App Google Apps Script:</strong>
         </div>
-        <input type="text" id="script-url" placeholder="Paste URL Apps Script (https://script.google.com/macros/s/.../exec)" 
+        <input type="text" id="script-url" placeholder="Paste URL Apps Script..." 
                class="w-full md:w-2/3 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-500">
         <button onclick="saveApiUrl()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold transition">
           Simpan & Hubungkan
@@ -60,43 +61,139 @@
       </div>
     </section>
 
-    <!-- Ringkasan Kas & Agenda -->
-    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="card-glass p-6 rounded-2xl border-l-4 border-l-emerald-500">
+    <!-- Ringkasan Statistik Utama -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="card-glass p-5 rounded-2xl border-l-4 border-l-emerald-500">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs uppercase font-semibold tracking-wider text-slate-400">Saldo Kas Utama</p>
-            <h3 id="saldo-utama" class="text-3xl font-extrabold text-emerald-400 mt-2">Rp 0</h3>
+            <p class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Saldo Kas Utama</p>
+            <h3 id="saldo-utama" class="text-2xl font-extrabold text-emerald-400 mt-1">Rp 0</h3>
           </div>
-          <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 text-2xl"><i class="fa-solid fa-wallet"></i></div>
+          <div class="p-2.5 bg-emerald-500/10 rounded-xl text-emerald-400 text-xl"><i class="fa-solid fa-wallet"></i></div>
         </div>
       </div>
 
-      <div class="card-glass p-6 rounded-2xl border-l-4 border-l-amber-500">
+      <div class="card-glass p-5 rounded-2xl border-l-4 border-l-cyan-500">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs uppercase font-semibold tracking-wider text-slate-400">Total Agenda Aktif</p>
-            <h3 id="total-agenda" class="text-3xl font-extrabold text-amber-400 mt-2">0 Kegiatan</h3>
+            <p class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Saldo Kas KISWA</p>
+            <h3 id="saldo-kiswa" class="text-2xl font-extrabold text-cyan-400 mt-1">Rp 0</h3>
           </div>
-          <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400 text-2xl"><i class="fa-solid fa-calendar-check"></i></div>
+          <div class="p-2.5 bg-cyan-500/10 rounded-xl text-cyan-400 text-xl"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        </div>
+      </div>
+
+      <div class="card-glass p-5 rounded-2xl border-l-4 border-l-amber-500">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Total Agenda Aktif</p>
+            <h3 id="total-agenda" class="text-2xl font-extrabold text-amber-400 mt-1">5 Kegiatan</h3>
+          </div>
+          <div class="p-2.5 bg-amber-500/10 rounded-xl text-amber-400 text-xl"><i class="fa-solid fa-calendar-check"></i></div>
+        </div>
+      </div>
+
+      <div class="card-glass p-5 rounded-2xl border-l-4 border-l-purple-500">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Belajar Tajwid</p>
+            <h3 class="text-2xl font-extrabold text-purple-400 mt-1">Program Rutin</h3>
+          </div>
+          <div class="p-2.5 bg-purple-500/10 rounded-xl text-purple-400 text-xl"><i class="fa-solid fa-book-quran"></i></div>
         </div>
       </div>
     </section>
 
-    <!-- Daftar Kegiatan -->
+    <!-- Section Modul Belajar Tajwid -->
+    <section class="card-glass p-6 rounded-2xl border border-purple-500/30 bg-purple-950/10">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-purple-300 flex items-center gap-2">
+          <i class="fa-solid fa-book-open text-purple-400"></i> Program Belajar Tajwid & Tahsin Al-Qur'an
+        </h2>
+        <span class="text-xs px-2.5 py-1 bg-purple-500/20 text-purple-300 rounded-full font-semibold">Jadwal Rutin Jamaah</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 bg-slate-800/80 rounded-xl border border-slate-700/60">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-emerald-400">Materi Dasar Tajwid</span>
+            <span class="font-arabic text-lg text-amber-300">أَحْكَامُ النُّونِ السَّاكِنَةِ</span>
+          </div>
+          <h4 class="font-bold text-white mt-1">Hukum Nun Mati & Tanwin</h4>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+            Mempelajari Izhar, Idgham (Bighunnah & Bilaghunnah), Iqlab, serta Ikhfa Haqiqi beserta praktik langsung dalam bacaan surat pendek Al-Qur'an.
+          </p>
+        </div>
+
+        <div class="p-4 bg-slate-800/80 rounded-xl border border-slate-700/60">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-emerald-400">Mata Pelajaran Mad</span>
+            <span class="font-arabic text-lg text-amber-300">أَحْكَامُ المَدِّ</span>
+          </div>
+          <h4 class="font-bold text-white mt-1">Hukum Mad & Panjang Bacaan</h4>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+            Pembahasan Mad Thabi'i (Asli) dan Mad Far'i (Mad Wajib Muttashil, Jaiz Munfashil, Arid Lissukun) untuk menyempurnakan bacaan shalat.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agenda & Jadwal Kegiatan -->
     <section class="card-glass p-6 rounded-2xl">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-bold text-emerald-300 flex items-center gap-2"><i class="fa-solid fa-list-check"></i> Agenda & Jadwal Kegiatan</h2>
       </div>
       <div id="kegiatan-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <p class="text-slate-400 text-sm">Memuat data dari Google Sheets...</p>
+        <div class="p-4 bg-slate-800/60 rounded-xl border border-slate-700/50">
+          <span class="text-[10px] px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-semibold">Rapat</span>
+          <h4 class="font-bold text-white mt-2">Rapat DKM</h4>
+          <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-user-tie text-emerald-400 mr-1"></i> Pengurus</p>
+          <p class="text-xs text-slate-400"><i class="fa-solid fa-clock text-amber-400 mr-1"></i> Kamis, 5 Nov 2026</p>
+        </div>
+        <div class="p-4 bg-slate-800/60 rounded-xl border border-slate-700/50">
+          <span class="text-[10px] px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-semibold">Kajian</span>
+          <h4 class="font-bold text-white mt-2">Kajian Bulanan</h4>
+          <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-user-tie text-emerald-400 mr-1"></i> Ust Ade Mulyana</p>
+          <p class="text-xs text-slate-400"><i class="fa-solid fa-clock text-amber-400 mr-1"></i> Jumat, 6 Nov 2026 (Bada Maghrib)</p>
+        </div>
+        <div class="p-4 bg-slate-800/60 rounded-xl border border-slate-700/50">
+          <span class="text-[10px] px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-semibold">Kajian</span>
+          <h4 class="font-bold text-white mt-2">NGASUH</h4>
+          <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-user-tie text-emerald-400 mr-1"></i> Kang Zain</p>
+          <p class="text-xs text-slate-400"><i class="fa-solid fa-clock text-amber-400 mr-1"></i> Sabtu, 21 Nov 2026 (Bada Subuh)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Galeri & Dokumentasi Kegiatan -->
+    <section class="card-glass p-6 rounded-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold text-cyan-300 flex items-center gap-2"><i class="fa-solid fa-images"></i> Galeri & Dokumentasi Masjid</h2>
+      </div>
+      <div id="galeri-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700/50 text-center">
+          <div class="w-full h-36 bg-slate-700/50 rounded-lg flex items-center justify-center text-slate-500 mb-2">
+            <i class="fa-solid fa-book-quran text-3xl text-purple-400"></i>
+          </div>
+          <p class="text-xs font-semibold text-slate-300">Kegiatan Belajar Tajwid</p>
+        </div>
+        <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700/50 text-center">
+          <div class="w-full h-36 bg-slate-700/50 rounded-lg flex items-center justify-center text-slate-500 mb-2">
+            <i class="fa-solid fa-users text-3xl text-emerald-400"></i>
+          </div>
+          <p class="text-xs font-semibold text-slate-300">Pengajian Rutin Jamaah</p>
+        </div>
+        <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700/50 text-center">
+          <div class="w-full h-36 bg-slate-700/50 rounded-lg flex items-center justify-center text-slate-500 mb-2">
+            <i class="fa-solid fa-hands-holding-child text-3xl text-amber-400"></i>
+          </div>
+          <p class="text-xs font-semibold text-slate-300">Santunan & Kegiatan Sosial</p>
+        </div>
       </div>
     </section>
 
   </main>
 
   <script>
-    // URL Default terkuci ke Versi 12 Apps Script
     let API_URL = localStorage.getItem('MSM_SCRIPT_URL') || 'https://script.google.com/macros/s/AKfycbxw8gAoBBRDwl8FQfNOMeBZ5DwmwK-tdQzQ5rTEZbIpMuwxf7H4vrFGPL69Wb4f3Xd/exec';
 
     if (API_URL) {
@@ -119,7 +216,7 @@
       document.getElementById('date').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     }, 1000);
 
-    // Fetch Data via JSONP (Mencegah Blokir CORS)
+    // Fetch Data via JSONP
     function loadDashboardData() {
       if (!API_URL) return;
       const statusBadge = document.getElementById('status-badge');
@@ -148,8 +245,6 @@
             </div>
           `).join('');
           document.getElementById('total-agenda').innerText = `${data.kegiatan.length} Kegiatan`;
-        } else {
-          kegContainer.innerHTML = `<p class="text-slate-400 text-sm">Belum ada kegiatan terdaftar dalam spreadsheet.</p>`;
         }
       };
 
